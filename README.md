@@ -2,7 +2,7 @@
 
 This is an example repository. An instance of `airflow` will get the DAG found here and will be able to execute it if this DAG follows the proper format.
 
-In this repository there is a `master branch` with schema that shows the structure that the DAG should follow, the user only has to modify the indicated values and insert the code where it is specified.
+In this repository there is a `master branch` with schema that shows the structure that the DAG should follow, the user only has to modify the indicated values and insert the code where it is specified. In case you want to synchronize with a central repository follow the steps in [Platform as user](#platform-as-user) section
 
 In addition, there is another branch with a functional example of a DAG that will process the data, train 2 different models in parallel, select the one that gives the best result and register it.
 
@@ -11,13 +11,15 @@ In addition, there is another branch with a functional example of a DAG that wil
 - [DAGS](#dags)
   - [Table of Contents](#table-of-contents)
   - [DAG structure](#dag-structure)
-  - [Passing variables between tasks](#passing-variables-between-tasks)
-  - [Load DAGs](#load-dags)
-  - [Environment variables](#environment-variables)
+  - [Platform as user](#platform-as-user)
   - [Private Repositories](#private-repositories)
     - [Generate Project Token](#generate-project-token)
       - [Steps to Generate a Project Token in **GitLab**](#steps-to-generate-a-project-token-in-gitlab)
       - [Steps to Generate a Personal Project Token in **Github**](#steps-to-generate-a-personal-project-token-in-github)
+  - [Store secret in Github](#store-secret-in-github)
+  - [Passing variables between tasks](#passing-variables-between-tasks)
+  - [Load DAGs](#load-dags)
+  - [Environment variables](#environment-variables)
 
 ## DAG structure
 
@@ -31,73 +33,25 @@ The DAG, on the other hand, needs a previous configuration for its correct funct
 
 The main problem that this pre-configuration solves is the cloning of the repository, as by default Airflow only clones the DAG in the container, so if the DAG makes use of other Python files of the repository, it will not be able to import them.
 
-## Passing variables between tasks
+## Platform as user
 
-Passing variables from one task to another gets complicated, as each task runs in a different container.
+In version 3.0 of ai-toolkit, the platform is able to synchronize with a unique Git repository, in order to synchronize more than one repository it is necessary to use a [central repository](https://github.com/CLARUS-Project/ai-toolkit-central) and add submodules that refer to other repositories.
 
-Airflow offers the `x_com` functionality as a workaround but this only works if the variable being shared is an int, string or simple dict. This functionality creates a sidecar container, where the variables that are passed between tasks are stored in json format.
+Airflow integrates a component that is in charge of continuously synchronizing with the repository, when it detects submodules, it is able to synchronize with them as well.
 
-For example to pass a whole dataframe, `x_com` functionality does not work, therefore a `Redis` database has been added to the MLOps structure, this db is a very fast key-value database.
+These are the steps that the user must follow in order to correctly link his repository to the central repository and consequently load his DAGs in Airflow:
 
-This causes another limitation, the image on which the task is executed must also **include Redis as a dependency** in order to make use of this database.
+1. Clone this project and go to the master branch. In the `.github/workflows` folder there are 2 yml files, one for private repository and another for public repository, **Delete one of the 2 depending on the visibility of the repository**
 
-In the example DAG the dataframe is stored in `Redis` and using `x_com` the identifier with which the dataframe is stored is shared between tasks.
+2. Create a **access token** check [Steps to Generate a Personal Project Token in **Github**](#steps-to-generate-a-personal-project-token-in-github) section, it can be at user or project level, however, it needs to have **permissions to clone**, then store the **access token** as a project secret with the name **ACCESS_TOKEN**, See the [Store secret in Github](#store-secret-in-github) section. (**ONLY FOR PRIVATE REPOSITORIES**)
 
-## Load DAGs
+3. The **platform manager** should provide the user with a token, which should be saved as a secret named **CENTRAL_REPO_TOKEN**, see the [Store secret in Github](#store-secret-in-github) section.
 
-To specify to Airflow from which repository it has to load the DAGs, in the [ai-toolkit repository](https://github.com/CLARUS-Project/ai-toolkit/tree/main/Cloud), in the `.env` file it is necessary to modify the variable `AIRFLOW_GIT_SYNC_REPO`. More information on this can be found in the repository itself.
+4. Modify the template that has been cloned previously by following the instructions. When you push the commit, it will be synchronized with the central repository automatically.
 
-## Environment variables
+This automation is achieved by using 2 different pipelines, one in this project and the other in this project. The resulting flow:
 
-In case the task uses environment variables, there are 2 ways to define them.
-
-Define them in the dag and pass them as a parameter to a task:
-
-```python
-let vars = {
-    "VAR_1": "var1",
-    "VAR_2": "var2"
-}
-
-@task.kubernetes(
-    env_vars=vars
-)
-def task_1():
-```
-
-Or define them in the Airflow UI:
-
-![Airflow Environment variables](images/Env.png)
-
-And then import them to each task:
-
-```python
-from airflow.models import Variable
-
-let vars = {
-    "VAR_1": Variable.get("VAR_1"),
-    "VAR_2": Variable.get("VAR_2")
-}
-
-@task.kubernetes(
-    env_vars=vars
-)
-def task_1():
-```
-
-This method is more secure as Airflow encrypts the variables and hides them in the logs.
-
-When deploying the toolkit, a few variables are loaded into Airflow, although these are not visible in the UI. These are the variables, they can be modified beforehand in the respective .env in the [ai-toolkit repository](https://github.com/CLARUS-Project/ai-toolkit/tree/main/Cloud):
-
-    * CONNECTOR_EDGE_IP
-    * CONNECTOR_CLOUD_IP
-    * AUTH_PROXY_USER
-    * AUTH_PROXY_PASSWORD
-    * AUTH_ECC_USER
-    * AUTH_ECC_PASSWORD
-    * IDS_PROXY_PORT
-    * ECC_API_PORT
-    * IDS_EXTERNAL_ECC_IDS_PORT
+![CI/CD flow scheme](images/central_repo_scheme.png)
 
 ## Private Repositories
 
@@ -180,3 +134,82 @@ this section will show you how to generate a personal access token but Github al
 6. Generate Token
 
     Scroll down and click on "Generate token" at the bottom of the page. Once the token is generated, copy the displayed value. **This will be the only time you can copy it, as it will not be shown again.**
+
+
+## Store secret in Github
+
+1. In the project go to `Settings`
+2. `Secrets and variables` --> `Actions`
+   
+   ![secret](images/Secret.png)
+3. Create a `New repository secret`
+4. Add a name and copy the Secret value
+
+
+## Passing variables between tasks
+
+Passing variables from one task to another gets complicated, as each task runs in a different container.
+
+Airflow offers the `x_com` functionality as a workaround but this only works if the variable being shared is an int, string or simple dict. This functionality creates a sidecar container, where the variables that are passed between tasks are stored in json format.
+
+For example to pass a whole dataframe, `x_com` functionality does not work, therefore a `Redis` database has been added to the MLOps structure, this db is a very fast key-value database.
+
+This causes another limitation, the image on which the task is executed must also **include Redis as a dependency** in order to make use of this database.
+
+In the example DAG the dataframe is stored in `Redis` and using `x_com` the identifier with which the dataframe is stored is shared between tasks.
+
+## Load DAGs
+
+To specify to Airflow from which repository it has to load the DAGs, in the `toolkit` repository (https://github.com/CLARUS-HE-Project/ai-toolkit/tree/v2.0.0-red-wine) in the `.env` file it is necessary to modify the variable `AIRFLOW_GIT_SYNC_REPO`
+
+## Environment variables
+
+In case the task uses environment variables, there are 2 ways to define them.
+
+Define them in the dag and pass them as a parameter to a task:
+
+```python
+let vars = {
+    "VAR_1": "var1",
+    "VAR_2": "var2"
+}
+
+@task.kubernetes(
+    env_vars=vars
+)
+def task_1():
+```
+
+Or define them in the Airflow UI:
+
+![Airflow Environment variables](images/Env.png)
+
+And then import them to each task:
+
+```python
+from airflow.models import Variable
+
+let vars = {
+    "VAR_1": Variable.get("VAR_1"),
+    "VAR_2": Variable.get("VAR_2")
+}
+
+@task.kubernetes(
+    env_vars=vars
+)
+def task_1():
+```
+
+This method is more secure as Airflow encrypts the variables and hides them in the logs.
+
+When deploying the toolkit, a few variables are loaded into Airflow, although these are not visible in the UI. These are the variables, they can be modified beforehand in the respective .env in the [ai-toolkit repository](https://github.com/CLARUS-Project/ai-toolkit/tree/main/Cloud):
+
+    * CONNECTOR_EDGE_IP
+    * CONNECTOR_CLOUD_IP
+    * AUTH_PROXY_USER
+    * AUTH_PROXY_PASSWORD
+    * AUTH_ECC_USER
+    * AUTH_ECC_PASSWORD
+    * IDS_PROXY_PORT
+    * ECC_API_PORT
+    * IDS_EXTERNAL_ECC_IDS_PORT
