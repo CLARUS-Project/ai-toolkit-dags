@@ -1,0 +1,25 @@
+name: Sync Submodule
+
+on:
+    push:
+        paths:
+            - '**.py'
+
+jobs:
+    trigger_workflow:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Trigger central repo workflow
+              uses: convictional/trigger-workflow-and-wait@v1.6.1
+              with:
+                  owner: CLARUS-Project
+                  repo: ai-toolkit-central
+                  github_token: ${{  secrets.CENTRAL_REPO_TOKEN  }}
+                  workflow_file_name: sync_submodule.yml 
+                  ref: main
+                  wait_interval: 10
+                  propagate_failure: true
+                  trigger_workflow: true
+                  wait_workflow: true
+                  client_payload: '{"submodule":"https://${{  github.repository_owner  }}:${{  secrets.ACCESS_TOKEN  }}@github.com/${{  github.repository  }}.git","submodule_path":"${{  github.repository  }}","branch":"${{  github.ref_name  }}"}'
