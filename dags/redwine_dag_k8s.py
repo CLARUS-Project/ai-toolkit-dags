@@ -39,7 +39,8 @@ def redwine_dag_over_k8s():
         "TRUE_CONNECTOR_EDGE_IP": Variable.get("CONNECTOR_EDGE_IP"),
         "TRUE_CONNECTOR_EDGE_PORT": Variable.get("IDS_EXTERNAL_ECC_IDS_PORT"),
         "TRUE_CONNECTOR_CLOUD_IP": Variable.get("CONNECTOR_CLOUD_IP"),
-        "TRUE_CONNECTOR_CLOUD_PORT": Variable.get("IDS_PROXY_PORT")
+        "TRUE_CONNECTOR_CLOUD_PORT": Variable.get("IDS_PROXY_PORT"),
+        "MLFLOW_ENDPOINT": Variable.get("MLFLOW_ENDPOINT")
     }
 
     volume_mount = k8s.V1VolumeMount(

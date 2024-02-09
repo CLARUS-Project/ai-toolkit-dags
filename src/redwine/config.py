@@ -1,7 +1,7 @@
 import os
 
 # MLFLOW MODEL TRACKING
-MLFLOW_ENDPOINT = 'http://mlflow.mlflow.svc.cluster.local:5000'
+MLFLOW_ENDPOINT = os.getenv("MLFLOW_ENDPOINT")
 MLFLOW_EXPERIMENT = "Clarus_RedWine_experiment"
 POSTGRES_DATABASE = os.getenv("POSTGRES_DATABASE")
 POSTGRES_USERNAME = os.getenv("POSTGRES_USERNAME")
