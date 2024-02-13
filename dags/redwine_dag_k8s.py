@@ -27,7 +27,7 @@ from airflow.models import Variable
     start_date=datetime.now(),
     catchup=False,
     tags=['demo', 'redWine'],
-)
+) 
 def redwine_dag_over_k8s():
 
     env_vars={
