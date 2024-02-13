@@ -43,7 +43,9 @@ These are the steps that the user must follow in order to correctly link his rep
 
 1. Clone this project and go to the master branch. In the `.github/workflows` folder there are 2 yml files, one for private repository and another for public repository, **Delete one of the 2 depending on the visibility of the repository**
 
-2. Create a **access token** check [Steps to Generate a Personal Project Token in **Github**](#steps-to-generate-a-personal-project-token-in-github) section, it can be at user or project level, however, it needs to have **permissions to clone**, then store the **access token** as a project secret with the name **ACCESS_TOKEN**, See the [Store secret in Github](#store-secret-in-github) section. (**ONLY FOR PRIVATE REPOSITORIES**)
+2. Create a **access token** check [Steps to Generate a Personal Project Token in **Github**](#steps-to-generate-a-personal-project-token-in-github) section, it can be at user or project level, however, it needs to have **permissions to clone**, then store the **access token** as a project secret with the name **ACCESS_TOKEN**, See the [Store secret in Github](#store-secret-in-github) section. (**ONLY FOR PRIVATE REPOSITORIES**).
+
+    Then replace the user with the value provided by the platform administrator and write the name of the DAG, you can provide more than one DAG by separating them with a blank space. The name of the DAG is the same as the name given to the template function that has the "@dag()" before it
 
 3. The **platform manager** should provide the user with a token, which should be saved as a secret named **CENTRAL_REPO_TOKEN**, see the [Store secret in Github](#store-secret-in-github) section.
 
