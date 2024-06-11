@@ -47,7 +47,7 @@ def GPU_priority_demo():
     init_container = k8s.V1Container(
         name="git-clone",
         image="alpine/git:latest",
-        command=["sh", "-c", "mkdir -p /git && cd /git && git clone -b gpu-test --single-branch https://github.com/CLARUS-Project/ai-toolkit-dags.git"],
+        command=["sh", "-c", "mkdir -p /git && cd /git && git clone -b gpu_example --single-branch https://github.com/CLARUS-Project/ai-toolkit-dags.git"],
         volume_mounts=init_container_volume_mounts
     )
 
