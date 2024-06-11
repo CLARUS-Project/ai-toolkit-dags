@@ -1,8 +1,8 @@
 name: Sync Submodule
 
 env:
-    username: 'clarus_user' # The user provided by the platform administrator
-    dag: 'redwine_dag_over_k8s' # The name of the DAG in the template is the name of the function with the @dag before it.
+    username: 'ikerlan' # The user provided by the platform administrator
+    dag: 'GPU_usage_workflow,GPU_DEMO' # The name of the DAG in the template is the name of the function with the @dag before it.
                       # You can specify more than 1 by separating the names with a space.
 
 on:
