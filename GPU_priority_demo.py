@@ -20,7 +20,7 @@ from datetime import timedelta
         'retry_delay': timedelta(minutes=1),
     }
 )
-def GPU_DEMO():
+def GPU_priority_demo():
 
     env_vars={
         "POSTGRES_USERNAME": Variable.get("POSTGRES_USERNAME"),
@@ -86,7 +86,7 @@ def GPU_DEMO():
         import sys
         import time
     
-        sys.path.insert(1, '/git/Clarus-Test')
+        sys.path.insert(1, '/git/ai-toolkit-dags')
         from train import train_and_evaluate
     
         return train_and_evaluate(device_type='cuda')
@@ -113,7 +113,7 @@ def GPU_DEMO():
         import sys
         import time
     
-        sys.path.insert(1, '/git/Clarus-Test')
+        sys.path.insert(1, '/git/ai-toolkit-dags')
         from train import train_and_evaluate
     
         return train_and_evaluate(device_type='cuda')
@@ -141,7 +141,7 @@ def GPU_DEMO():
         import sys
         import time
     
-        sys.path.insert(1, '/git/Clarus-Test')
+        sys.path.insert(1, '/git/ai-toolkit-dags')
         from train import train_and_evaluate
     
         return train_and_evaluate(device_type='cuda')
@@ -169,4 +169,4 @@ def GPU_DEMO():
     # [train_GPU_result, sleep_result >> [train_GPU_high_result, train_GPU_low_result]]
     [train_GPU_low_result, train_GPU_medium_result, sleep_result >> train_GPU_high_result]
 # Call the DAG 
-GPU_DEMO()
+GPU_priority_demo()

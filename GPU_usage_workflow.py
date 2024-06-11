@@ -81,7 +81,7 @@ def GPU_usage_workflow():
         import sys
         import time
     
-        sys.path.insert(1, '/git/Clarus-Test')
+        sys.path.insert(1, '/git/ai-toolkit-dags')
         from train import train_and_evaluate
         
         # redis_client = redis.StrictRedis(
@@ -113,7 +113,7 @@ def GPU_usage_workflow():
         import sys
         import time
     
-        sys.path.insert(1, '/git/Clarus-Test')
+        sys.path.insert(1, '/git/ai-toolkit-dags')
         from train import train_and_evaluate
         
         # redis_client = redis.StrictRedis(
