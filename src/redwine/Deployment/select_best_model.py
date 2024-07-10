@@ -55,5 +55,36 @@ def select_best_model():
     model_metrics = run.data.metrics
     print(f'BEST RUN: {best_run_id}')
 
+    # Change stage functionality:
+    # Find the model version associated with the best run
+    filter_string = f"run_id = '{best_run_id}'"
+    model_versions = client.search_model_versions(filter_string)
+    best_model_version = model_versions[0].version
+    best_model_name = model_versions[0].name
+    print(f'BEST MODEL NAME: {best_model_name}')
+
+    # Check if there are any models in production and archive them
+    registered_models = client.list_registered_models()
+    for registered_model in registered_models:
+        all_versions = client.search_model_versions(f"name='{registered_model.name}'")
+        for version in all_versions:
+            if version.current_stage == "Production":
+                client.transition_model_version_stage(
+                    name=version.name,
+                    version=version.version,
+                    stage="Archived"
+                )
+                print(f'Model version {version.version} of {version.name} has been archived.')
+
+
+
+    # Transition the model to production stage
+    client.transition_model_version_stage(
+        name=best_model_name,
+        version=best_model_version,
+        stage="Production"
+    )
+    print(f'Model version {best_model_version} of {best_model_name} has been transitioned to production.')
+
     return {'best_run': best_run_id, 'artifact_path': artifact_path, 'model_metrics': model_metrics}
 
