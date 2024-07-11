@@ -6,7 +6,7 @@ scripts and included in the Data directory.
 """
 
 import pandas as pd
-from IDS_templates.rest_ids_consumer_connector import RestIDSConsumerConnector
+from ids_agent_client import IDSAgentClient
 import config
 
 def read_data() -> pd.DataFrame:
@@ -19,15 +19,22 @@ def read_data() -> pd.DataFrame:
         A Pandas DataFrame representing the content of the specified file.
     """
 
-    ids_consumer = RestIDSConsumerConnector()
-    data = ids_consumer.get_external_artifact_by_resource_title(
-        config.MLFLOW_EXPERIMENT, 
-        config.TRUE_CONNECTOR_EDGE_IP, 
-        config.TRUE_CONNECTOR_EDGE_PORT, 
-        config.TRUE_CONNECTOR_CLOUD_IP, 
-        config.TRUE_CONNECTOR_CLOUD_PORT
-    )
-    
-    df = pd.read_csv(data, delimiter=';', quotechar='"')
-    
-    return df
+    try:
+
+        #if not using IDS, your own code
+        #df = pd.read_csv("", delimiter=';', quotechar='"')
+
+        #if using IDS
+        ids_agent_client = IDSAgentClient()
+        #Get minio enviromental variables
+        
+        ids_agent_client.read_dataset_from_ids(config.MLFLOW_EXPERIMENT, "localhost","34.250.205.215:30010","minio","minio123")
+        if ids_agent_client == False:
+            return None
+        else:    
+            
+            df = pd.read_csv("dataset.csv", delimiter=';', quotechar='"')       
+            return df
+    except Exception as exc:
+        print(f'error:  { str(exc)}') 
+        return None
