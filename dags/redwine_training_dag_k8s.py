@@ -21,6 +21,10 @@ from airflow.decorators import dag, task
 from kubernetes.client import models as k8s
 from airflow.models import Variable
 
+import subprocess
+def install_libraries():
+    subprocess.check_call(['pip', 'install', 'minio'])
+
 @dag(
     description='MLOps lifecycle',
     schedule_interval='0 12 * * *', 
@@ -79,6 +83,8 @@ def redwine_training_dag_over_k8s():
         import redis
         import uuid
         import pickle
+
+        install_libraries()
 
         sys.path.insert(1, '/git/ai-toolkit-dags/src/redwine')
         from Data.read_data import read_data
