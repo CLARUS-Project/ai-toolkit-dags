@@ -6,8 +6,7 @@ scripts and included in the Data directory.
 """
 
 import pandas as pd
-from Data import ids_agent_client
-from ids_agent_client import IDSAgentClient
+from Data.ids_agent_client import IDSAgentClient
 import config
 
 def read_data() -> pd.DataFrame:
