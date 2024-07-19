@@ -20,7 +20,7 @@ def read_data() -> pd.DataFrame:
     """
 
     try:
-
+        print('Starting to read data')
         #if not using IDS, your own code
         #df = pd.read_csv("", delimiter=';', quotechar='"')
 
@@ -34,7 +34,9 @@ def read_data() -> pd.DataFrame:
         else:    
             
             df = pd.read_csv("dataset.csv", delimiter=';', quotechar='"')       
+            print('Dataset retrieved successfully from IDS')
             return df
+        
     except Exception as exc:
         print(f'error:  { str(exc)}') 
         return None
