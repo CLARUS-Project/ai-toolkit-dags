@@ -28,7 +28,7 @@ def read_data() -> pd.DataFrame:
         ids_agent_client = IDSAgentClient()
         #Get minio enviromental variables
         
-        ids_agent_client.read_dataset_from_ids(config.MLFLOW_EXPERIMENT, "localhost","34.250.205.215:30010","minio","minio123")
+        ids_agent_client.read_dataset_from_ids(config.MLFLOW_EXPERIMENT, "34.251.246.165","34.250.205.215:30010","minio","minio123")
         if ids_agent_client == False:
             return None
         else:    
