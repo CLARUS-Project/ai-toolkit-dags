@@ -19,13 +19,17 @@ def read_data() -> pd.DataFrame:
         ids_agent_client = IDSAgentClient()
         #Start transfer dataset
         resp= ids_agent_client.get_asset_from_ids(config.MLFLOW_EXPERIMENT,"34.250.205.215:30010")
+        print('Response from ids:')
+        print(resp)
         if resp == False:
             return None
         else:    
             #Get dataset from agent volume
             response=ids_agent_client.get_dataset(config.MLFLOW_EXPERIMENT)
             data = StringIO(response)
-            df = pd.read_csv(data, delimiter=';', quotechar='"')       
+            df = pd.read_csv(data, delimiter=';', quotechar='"')    
+            print('DataFrame:')
+            print(df)   
             return df
     
     
