@@ -10,7 +10,7 @@ POSTGRES_PORT = os.getenv("POSTGRES_PORT")
 POSTGRES_HOST = os.getenv("POSTGRES_HOST")
 
 # METRIC FOR BEST MODEL
-METRIC_BM = "r2_validation"
+METRIC_BM = "validation_r2"
 METRIC_BM_TYPE = "max"
 
 # IDS

@@ -64,7 +64,7 @@ def select_best_model():
     print(f'BEST MODEL NAME: {best_model_name}')
 
     # Check if there are any models in production and archive them
-    registered_models = client.list_registered_models()
+    registered_models = client.search_registered_models()
     for registered_model in registered_models:
         all_versions = client.search_model_versions(f"name='{registered_model.name}'")
         for version in all_versions:
