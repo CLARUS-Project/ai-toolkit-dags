@@ -1,6 +1,6 @@
 import pandas as pd
 from io import StringIO
-from ids_read.ids_agent_client  import IDSAgentClient
+from Data.ids_agent_client  import IDSAgentClient
 import config
 
 def read_data() -> pd.DataFrame:
