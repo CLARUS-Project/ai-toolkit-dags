@@ -42,36 +42,27 @@ def select_best_model():
     # Sort by creation timestamp to get the most recent one
     latest_model_name, latest_version = max(production_models, key=lambda x: x[1].last_updated_timestamp)
 
-    # Get the new model version
-    new_model_version = client.get_latest_versions(name=latest_model_name, stages=["None"])[-1]
+    # Archive all models in production
+    for model_name, version in production_models:
+        client.transition_model_version_stage(
+            name=model_name,
+            version=version.version,
+            stage="Archived"
+        )
+        print(f'Model version {version.version} of {model_name} has been archived.')
 
-    # Check if there are any models in production and archive them
-    registered_models = client.list_registered_models()
-    for registered_model in registered_models:
-        all_versions = client.search_model_versions(f"name='{registered_model.name}'")
-        for version in all_versions:
-            if version.current_stage == "Production":
-                client.transition_model_version_stage(
-                    name=version.name,
-                    version=version.version,
-                    stage="Archived"
-                )
-                print(f'Model version {version.version} of {version.name} has been archived.')
-
-
-    # Transition the new model version to production
+    # Transition the latest model version to production
     client.transition_model_version_stage(
         name=latest_model_name,
-        version=new_model_version.version,
+        version=latest_version.version,
         stage='Production',
         archive_existing_versions=True
     )
 
-
-    print(f"New model version {new_model_version.version} transitioned to production")
+    print(f"New model version {latest_version.version} transitioned to production")
 
     # Retrieve the run associated with the new model version
-    best_run_id = new_model_version.run_id
+    best_run_id = latest_version.run_id
     run = mlflow.get_run(best_run_id)
     artifact_path = run.info.artifact_uri + '/model'
     model_metrics = run.data.metrics
