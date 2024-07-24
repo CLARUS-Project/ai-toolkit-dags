@@ -12,6 +12,20 @@ from sklearn.linear_model import ElasticNet
 from datetime import datetime
 from Models import utils
 
+import mlflow
+from mlflow.tracking.client import MlflowClient
+import config
+
+
+endpoint = config.MLFLOW_ENDPOINT
+experiment = config.MLFLOW_EXPERIMENT
+metric = config.METRIC_BM
+metric_type = config.METRIC_BM_TYPE
+
+client = MlflowClient(endpoint)
+mlflow.set_tracking_uri(endpoint)
+mlflow.set_experiment(experiment)  
+
 def elasticNet_model_training(data: Dict[str, Any]):
     """
     Train an ElasticNet model using the provided data.
