@@ -40,7 +40,7 @@ def elasticNet_model_training(data: Dict[str, Any]):
     experiment = client.get_experiment_by_name(experiment_name)
     if experiment:
         experiment_id = experiment.experiment_id
-        client.delete_experiment(experiment_id)
+        client.restore_experiment(experiment_id)
         print(f"Experiment '{experiment_name}' deleted successfully.")
     else:
         print(f"Experiment '{experiment_name}' not found.")
