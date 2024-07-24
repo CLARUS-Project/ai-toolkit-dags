@@ -37,8 +37,7 @@ def elasticNet_model_training(data: Dict[str, Any]):
     metric_type = config.METRIC_BM_TYPE
 
     client = MlflowClient(endpoint)
-    mlflow.set_tracking_uri(endpoint)
-    mlflow.set_experiment(experiment) 
+    client.delete_experiment(experiment)
 
     train_x = data['train_x']
     train_y = data['train_y']
