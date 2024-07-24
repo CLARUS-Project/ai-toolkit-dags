@@ -12,13 +12,6 @@ from sklearn.linear_model import ElasticNet
 from datetime import datetime
 from Models import utils
 
-import mlflow
-from mlflow.tracking.client import MlflowClient
-import config
-
-
- 
-
 def elasticNet_model_training(data: Dict[str, Any]):
     """
     Train an ElasticNet model using the provided data.
@@ -31,19 +24,6 @@ def elasticNet_model_training(data: Dict[str, Any]):
     Returns:
         None
     """
-    endpoint = config.MLFLOW_ENDPOINT
-    experiment_name = config.MLFLOW_EXPERIMENT
-
-    client = MlflowClient(endpoint)
-
-    # Get the experiment ID from the experiment name
-    experiment = client.get_experiment_by_name(experiment_name)
-    if experiment:
-        experiment_id = experiment.experiment_id
-        client.restore_experiment(experiment_id)
-        print(f"Experiment '{experiment_name}' deleted successfully.")
-    else:
-        print(f"Experiment '{experiment_name}' not found.")
 
     train_x = data['train_x']
     train_y = data['train_y']
