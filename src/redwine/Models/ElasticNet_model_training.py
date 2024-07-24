@@ -17,14 +17,7 @@ from mlflow.tracking.client import MlflowClient
 import config
 
 
-endpoint = config.MLFLOW_ENDPOINT
-experiment = config.MLFLOW_EXPERIMENT
-metric = config.METRIC_BM
-metric_type = config.METRIC_BM_TYPE
-
-client = MlflowClient(endpoint)
-mlflow.set_tracking_uri(endpoint)
-mlflow.set_experiment(experiment)  
+ 
 
 def elasticNet_model_training(data: Dict[str, Any]):
     """
@@ -38,6 +31,14 @@ def elasticNet_model_training(data: Dict[str, Any]):
     Returns:
         None
     """
+    endpoint = config.MLFLOW_ENDPOINT
+    experiment = config.MLFLOW_EXPERIMENT
+    metric = config.METRIC_BM
+    metric_type = config.METRIC_BM_TYPE
+
+    client = MlflowClient(endpoint)
+    mlflow.set_tracking_uri(endpoint)
+    mlflow.set_experiment(experiment) 
 
     train_x = data['train_x']
     train_y = data['train_y']
