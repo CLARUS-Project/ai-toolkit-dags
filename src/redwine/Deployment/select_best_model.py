@@ -42,6 +42,9 @@ def select_best_model():
     # Sort by creation timestamp to get the most recent one
     latest_model_name, latest_version = max(production_models, key=lambda x: x[1].last_updated_timestamp)
 
+    # Get the new model version
+    new_model_version = client.get_latest_versions(name=latest_model_name, stages=["None"])[-1]
+
     # Archive all models in production
     for model_name, version in production_models:
         client.transition_model_version_stage(
@@ -54,7 +57,7 @@ def select_best_model():
     # Transition the latest model version to production
     client.transition_model_version_stage(
         name=latest_model_name,
-        version=latest_version.version,
+        version=new_model_version.version,
         stage='Production',
         archive_existing_versions=True
     )
