@@ -68,4 +68,4 @@ def model_retrain(data: Dict[str, Any]):
 
     print(f"Model name retrained: {latest_model_name}, Latest version: {latest_version}")
     
-    return new_run
+    # return new_run
