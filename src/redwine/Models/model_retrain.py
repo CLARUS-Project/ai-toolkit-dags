@@ -66,6 +66,6 @@ def model_retrain(data: Dict[str, Any]):
     # Track the run
     new_run = utils.track_run(latest_model_name,estimator_name,hyperparams,training_metrics,validation_metrics,best_model)
 
-    print(f"Model name retrained: {latest_model_name}, Latest version: {latest_version}")
+    print(f"Model name retrained: {latest_model_name}, Latest version: {latest_version.version}")
     
     # return new_run
