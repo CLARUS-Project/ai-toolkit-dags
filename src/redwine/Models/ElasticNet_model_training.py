@@ -32,12 +32,18 @@ def elasticNet_model_training(data: Dict[str, Any]):
         None
     """
     endpoint = config.MLFLOW_ENDPOINT
-    experiment = config.MLFLOW_EXPERIMENT
-    metric = config.METRIC_BM
-    metric_type = config.METRIC_BM_TYPE
+    experiment_name = config.MLFLOW_EXPERIMENT
 
     client = MlflowClient(endpoint)
-    client.delete_experiment(experiment)
+
+    # Get the experiment ID from the experiment name
+    experiment = client.get_experiment_by_name(experiment_name)
+    if experiment:
+        experiment_id = experiment.experiment_id
+        client.delete_experiment(experiment_id)
+        print(f"Experiment '{experiment_name}' deleted successfully.")
+    else:
+        print(f"Experiment '{experiment_name}' not found.")
 
     train_x = data['train_x']
     train_y = data['train_y']
