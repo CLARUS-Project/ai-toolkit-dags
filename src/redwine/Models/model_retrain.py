@@ -69,12 +69,12 @@ def model_retrain(data: Dict[str, Any]):
     # Find the newly registered version of the model
     new_model_version = client.get_latest_versions(name=latest_model_name, stages=["None"])[-1]  # Gets the latest version just registered
 
-    print(f"Model name retrained: {latest_model_name}, New version: {new_model_version.version}, New run id: {new_run.info.run_id}")
-
     retrain_info = {
         'latest_model_name': latest_model_name,
         'new_version': new_model_version.version,  # This is the new version just registered
         'new_run_id': new_run.info.run_id  # The run ID of the new run
     }
+
+    print(retrain_info)
     # Return relevant information for the next step (new model version and run ID)
     return retrain_info
