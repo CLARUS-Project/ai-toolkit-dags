@@ -143,7 +143,7 @@ def redwine_production_dag_over_k8s():
         env_vars=env_vars,
         do_xcom_push=True
     )
-    def select_best_model_task(read_id):
+    def select_best_model_task(read_id,retrain_info):
         import redis
         import sys
 
@@ -158,7 +158,7 @@ def redwine_production_dag_over_k8s():
 
         redis_client.delete('data-' + read_id)
 
-        return select_best_model()
+        return select_best_model(retrain_info)
     
     @task.kubernetes(
         image='clarusproject/dag-image:1.0.0-slim',
@@ -183,7 +183,7 @@ def redwine_production_dag_over_k8s():
     # Instantiate each task and define task dependencies
     processing_result = read_data_procces_task()
     model_retraining_result = model_retraining_result_task(processing_result)
-    select_best_model_result = select_best_model_task(processing_result)
+    select_best_model_result = select_best_model_task(processing_result,model_retraining_result)
     register_experiment_result = register_experiment_task(select_best_model_result)
 
     # Define the order of the pipeline
