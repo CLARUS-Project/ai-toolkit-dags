@@ -109,7 +109,8 @@ def redwine_production_dag_over_k8s():
         init_containers=[init_container],
         volumes=[volume],
         volume_mounts=[volume_mount],
-        env_vars=env_vars
+        env_vars=env_vars,
+        do_xcom_push=True
 
     )
     def model_retraining_result_task(read_id=None):
