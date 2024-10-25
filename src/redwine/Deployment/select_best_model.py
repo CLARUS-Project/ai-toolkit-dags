@@ -10,7 +10,7 @@ import mlflow
 from mlflow.tracking.client import MlflowClient
 import config
 
-def select_best_model(retrain_info: dict):
+def select_best_model(retrain_info: dict = None):
     """
     Select the latest version of the retrained model and change the tag to production
 
@@ -24,6 +24,7 @@ def select_best_model(retrain_info: dict):
     client = MlflowClient(endpoint)
     mlflow.set_tracking_uri(endpoint)
     mlflow.set_experiment(experiment)  
+    print(retrain_info)
 
 
     latest_model_name = retrain_info['latest_model_name']
