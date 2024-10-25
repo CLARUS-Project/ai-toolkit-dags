@@ -128,8 +128,9 @@ def redwine_production_dag_over_k8s():
 
         data = redis_client.get('data-' + read_id)
         res = pickle.loads(data)
+        retrain_info = model_retrain(res)
 
-        return model_retrain(res)
+        return retrain_info
     
     @task.kubernetes(
         image='clarusproject/dag-image:1.0.0-slim',
