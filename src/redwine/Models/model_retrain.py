@@ -66,6 +66,14 @@ def model_retrain(data: Dict[str, Any]):
     # Track the run
     new_run = utils.track_run(latest_model_name,estimator_name,hyperparams,training_metrics,validation_metrics,best_model)
 
-    print(f"Model name retrained: {latest_model_name}, Latest version: {latest_version.version}")
-    
-    # return new_run
+    # Find the newly registered version of the model
+    new_model_version = client.get_latest_versions(name=latest_model_name, stages=["None"])[-1]  # Gets the latest version just registered
+
+    print(f"Model name retrained: {latest_model_name}, New version: {new_model_version.version}")
+
+    # Return relevant information for the next step (new model version and run ID)
+    return {
+        'latest_model_name': latest_model_name,
+        'new_version': new_model_version.version,  # This is the new version just registered
+        'new_run_id': new_run.info.run_id  # The run ID of the new run
+    }
