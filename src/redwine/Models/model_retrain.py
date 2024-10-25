@@ -71,9 +71,10 @@ def model_retrain(data: Dict[str, Any]):
 
     print(f"Model name retrained: {latest_model_name}, New version: {new_model_version.version}, New run id: {new_run.info.run_id}")
 
-    # Return relevant information for the next step (new model version and run ID)
-    return {
+    retrain_info = {
         'latest_model_name': latest_model_name,
         'new_version': new_model_version.version,  # This is the new version just registered
         'new_run_id': new_run.info.run_id  # The run ID of the new run
     }
+    # Return relevant information for the next step (new model version and run ID)
+    return retrain_info
