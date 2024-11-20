@@ -42,7 +42,8 @@ def redwine_production_dag_over_k8s():
         "TRUE_CONNECTOR_CLOUD_PORT": Variable.get("IDS_PROXY_PORT"),
         "MLFLOW_ENDPOINT": Variable.get("MLFLOW_ENDPOINT"),
         "MLFLOW_TRACKING_USERNAME": Variable.get("MLFLOW_TRACKING_USERNAME"),
-        "MLFLOW_TRACKING_PASSWORD": Variable.get("MLFLOW_TRACKING_PASSWORD")
+        "MLFLOW_TRACKING_PASSWORD": Variable.get("MLFLOW_TRACKING_PASSWORD"),
+        "container": "docker"
     }
 
     volume_mount = k8s.V1VolumeMount(
@@ -180,15 +181,94 @@ def redwine_production_dag_over_k8s():
 
         return register_experiment_rds(best_model_res)
     
+    @task.kubernetes(
+        image='mfernandezlabastida/kaniko:1.0',
+        name='build_inference',
+        task_id='build_inference',
+        namespace='airflow',
+        init_containers=[init_container],
+        volumes=[volume],
+        volume_mounts=[volume_mount],
+        do_xcom_push=True,
+        container_resources=k8s.V1ResourceRequirements(
+            requests={'cpu': '0.5'},
+            limits={'cpu': '1.5'}
+        ),
+        priority_class_name='medium-priority',
+        env_vars=env_vars
+    )
+    def build_inference_task(run_id):
+        import mlflow
+        import os
+        import logging
+        import subprocess
+
+        """
+        MODIFY WHAT YOU WANT
+        """
+        path = '/git/TFG_Demo/build_docker'
+        endpoint = 'registry-docker-registry.registry.svc.cluster.local:5001/redwine:prod'
+
+
+        def download_artifacts(run_id, path):
+            mlflow.set_tracking_uri("http://mlflow-tracking.mlflow.svc.cluster.local:5000")
+
+            local_path = mlflow.artifacts.download_artifacts(run_id=run_id, dst_path=path)
+
+            # Buscar el archivo model.pkl y moverlo a la carpeta local_path en caso de que se encuentre en una subcarpeta
+            for root, dirs, files in os.walk(local_path):
+                for file in files:
+                    if file.startswith("model"):
+                        logging.info(f"Encontrado archivo model.pkl en: {root}")
+                        os.rename(os.path.join(root, file), os.path.join(local_path + '/model', file))
+                    elif file.startswith("requirements"):
+                        logging.info(f"Encontrado archivo requirements.txt en: {root}")
+                        os.rename(os.path.join(root, file), os.path.join(path, file))
+
+        def modify_requirements_file(path):
+            required_packages = ["fastapi", "uvicorn", "pydantic", "numpy"]
+
+            with open(f"{path}/requirements.txt", "r") as f:
+                lines = f.readlines()
+
+            with open(f"{path}/requirements.txt", "w") as f:
+                for line in lines:
+                    if line.strip() not in required_packages:
+                        f.write(line)
+
+                f.write("\n")
+
+                for package in required_packages:
+                    f.write(f"{package}\n")
+
+
+        logging.warning(f"Downloading artifacts from run_id: {run_id['best_run']}")
+        download_artifacts(run_id['best_run'], path)
+        modify_requirements_file(path)
+
+        args = [
+            "/kaniko/executor",
+            f"--dockerfile={path}/Dockerfile",
+            f"--context={path}",
+            f"--destination={endpoint}",
+            f"--cache=false"
+        ]
+        result = subprocess.run(
+            args,
+            check=True  # Lanza una excepción si el comando devuelve un código diferente de cero
+        )
+        logging.warning(f"Kaniko executor finished with return code: {result.returncode}")
+    
 
     # Instantiate each task and define task dependencies
     processing_result = read_data_procces_task()
     model_retraining_result = model_retraining_result_task(processing_result)
     select_best_model_result = select_best_model_task(model_retraining_result)
     register_experiment_result = register_experiment_task(select_best_model_result)
+    build_inference_result = build_inference_task(select_best_model_result)
 
     # Define the order of the pipeline
-    processing_result >> model_retraining_result >> select_best_model_result >> register_experiment_result
+    processing_result >> model_retraining_result >> select_best_model_result >> [register_experiment_result, build_inference_result]
 
 # Call the DAG 
 redwine_production_dag_over_k8s()
