@@ -206,7 +206,7 @@ def redwine_production_dag_over_k8s():
         """
         MODIFY WHAT YOU WANT
         """
-        path = '/git/TFG_Demo/build_docker'
+        path = '/git/ai-toolkit-dags/build_docker'
         endpoint = 'registry-docker-registry.registry.svc.cluster.local:5001/redwine:prod'
 
 
