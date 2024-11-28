@@ -27,7 +27,7 @@ def read_data() -> pd.DataFrame:
             #Get dataset from agent volume
             response=ids_agent_client.get_dataset(config.MLFLOW_EXPERIMENT)
             data = StringIO(response)
-            df = pd.read_csv(data, delimiter=';', quotechar='"')    
+            df = pd.read_csv(data, sep='[;,]', engine='python')     
             print('DataFrame:')
             print(df)   
             return df
