@@ -23,7 +23,7 @@ from airflow.models import Variable
 
 @dag(
     description='MLOps lifecycle production',
-    schedule_interval='0 12 * * *', 
+    schedule_interval=None, 
     start_date=datetime(2022, 1, 1),
     catchup=False,
     tags=['demo', 'redWine_production'],
