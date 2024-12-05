@@ -182,7 +182,8 @@ def redwine_production_dag_over_k8s():
         return register_experiment_rds(best_model_res)
     
     @task.kubernetes(
-        image='mfernandezlabastida/kaniko:1.0',
+        #image='mfernandezlabastida/kaniko:1.0',
+        image='clarusproject/dag-image:kaniko',
         name='build_inference',
         task_id='build_inference',
         namespace='airflow',
@@ -233,7 +234,7 @@ def redwine_production_dag_over_k8s():
 
             with open(f"{path}/requirements.txt", "w") as f:
                 for line in lines:
-                    if line.strip() not in required_packages:
+                    if "mlflow" not in line and line.strip() not in required_packages:
                         f.write(line)
 
                 f.write("\n")
