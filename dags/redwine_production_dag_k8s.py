@@ -30,7 +30,7 @@ from airflow.models import Variable
 ) 
 def redwine_production_dag_over_k8s_inference_ids():
 
-    env_vars={
+    env_vars={ 
         "POSTGRES_USERNAME": Variable.get("POSTGRES_USERNAME"),
         "POSTGRES_PASSWORD": Variable.get("POSTGRES_PASSWORD"),
         "POSTGRES_DATABASE": Variable.get("POSTGRES_DATABASE"),
