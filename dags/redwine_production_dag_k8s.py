@@ -28,7 +28,7 @@ from airflow.models import Variable
     catchup=False,
     tags=['demo', 'redWine_production'],
 ) 
-def redwine_production_dag_over_k8s():
+def redwine_production_dag_over_k8s_inference_ids():
 
     env_vars={
         "POSTGRES_USERNAME": Variable.get("POSTGRES_USERNAME"),
@@ -59,7 +59,7 @@ def redwine_production_dag_over_k8s():
     init_container = k8s.V1Container(
         name="git-clone",
         image="alpine/git:latest",
-        command=["sh", "-c", "mkdir -p /git && cd /git && git clone -b red_wine_example_production --single-branch https://github.com/CLARUS-Project/ai-toolkit-dags.git"],
+        command=["sh", "-c", "mkdir -p /git && cd /git && git clone -b red_wine_example_production_inference_ids --single-branch https://github.com/CLARUS-Project/ai-toolkit-dags.git"],
         volume_mounts=init_container_volume_mounts
     )
 
@@ -208,7 +208,7 @@ def redwine_production_dag_over_k8s():
         MODIFY WHAT YOU WANT
         """
         path = '/git/ai-toolkit-dags/build_docker'
-        endpoint = 'registry-docker-registry.registry.svc.cluster.local:5001/redwine:prod'
+        endpoint = 'registry-docker-registry.registry.svc.cluster.local:5001/redwine:ids'
 
 
         def download_artifacts(run_id, path):
@@ -272,4 +272,4 @@ def redwine_production_dag_over_k8s():
     processing_result >> model_retraining_result >> select_best_model_result >> [register_experiment_result, build_inference_result]
 
 # Call the DAG 
-redwine_production_dag_over_k8s()
+redwine_production_dag_over_k8s_inference_ids()
