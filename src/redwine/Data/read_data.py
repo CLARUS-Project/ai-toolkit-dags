@@ -17,6 +17,7 @@ def read_data() -> pd.DataFrame:
     """
     try:
         ids_agent_client = IDSAgentClient()
+        
         #Start transfer dataset
         resp= ids_agent_client.get_asset_from_ids(config.MLFLOW_EXPERIMENT,"34.251.246.165")
         print('Response from ids:')
