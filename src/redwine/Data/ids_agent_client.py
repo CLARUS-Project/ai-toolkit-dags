@@ -100,7 +100,7 @@ class IDSAgentClient:
         """
         try:
             #Query agent to get dataset saved in volume 
-            url = "http://34.250.205.215:8082/api/v3/dataset?exp_id="+expId+"& asset_type=dataset"
+            url = "http://34.250.205.215:8082/api/v3/asset?exp_id="+expId+"& asset_type=dataset"
             #url = "http://localhost:8082/api/v2/dataset?exp_id="+expId
             response = self.get(url,120)
 
