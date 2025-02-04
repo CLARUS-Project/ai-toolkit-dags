@@ -204,10 +204,13 @@ def redwine_production_dag_over_k8s_inference_ids():
         import os
         import logging
         import subprocess
-        from src.redwine.config import MLFLOW_EXPERIMENT
+        
         import requests
         import json
+        import sys
 
+        sys.path.insert(1, '/git/ai-toolkit-dags/src/redwine')
+        from config import MLFLOW_EXPERIMENT
         """
         MODIFY WHAT YOU WANT
         """
