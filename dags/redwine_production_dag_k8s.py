@@ -204,7 +204,7 @@ def redwine_production_dag_over_k8s_inference_ids():
         import os
         import logging
         import subprocess
-        import src.redwine.config
+        from src.redwine.config import MLFLOW_EXPERIMENT
         import requests
         import json
 
@@ -215,7 +215,7 @@ def redwine_production_dag_over_k8s_inference_ids():
         endpoint = 'registry-docker-registry.registry.svc.cluster.local:5001/redwine:ids'
         endpoint_ids = '34.251.246.165:5001/redwine:ids'
         endpoint_service_internal_port = '8000'
-        exp_id= src.redwine.config.MLFLOW_EXPERIMENT
+        exp_id= MLFLOW_EXPERIMENT
         exp_description=''
         asset_type='docker'
 
