@@ -206,7 +206,6 @@ def redwine_production_dag_over_k8s_inference_ids():
         import subprocess
         
         import requests
-        import json
         import sys
 
         sys.path.insert(1, '/git/ai-toolkit-dags/src/redwine')
@@ -257,10 +256,10 @@ def redwine_production_dag_over_k8s_inference_ids():
         def create_ids_resource_if_not_exists(exp_id,exp_description,asset_type,endpoint_ids,endpoint_service_internal_port):
             
             #request clarus_ids_agent asset description
-            url = "http://34.250.205.215:8082/api/provider/asset?exp_id="+exp_id
+            url = "http://34.250.205.215:8082/api/provider/exist/asset?exp_id="+exp_id
             ret = requests.get(url, verify= False, timeout=120)
             #if not error
-            if ret.status_code != 200:
+            if ret.status_code == 200:
                 return False
             #request clarus_ids_agent asset creation 
             url = "http://34.250.205.215:8082/api/v3/provider/asset"
@@ -271,8 +270,8 @@ def redwine_production_dag_over_k8s_inference_ids():
                 "docker_img_url": endpoint_ids,
                 "docker_img_port": endpoint_service_internal_port
             }
-            json_payload = json.dump(payload)
-            ret= requests.post(url, data=json_payload, headers={"Content-Type": "application/json"})
+            
+            ret= requests.post(url, json=payload, headers={"Content-Type": "application/json"})
             if ret.status_code == 400:
                 logging.warning(f"Service inference not registed in TRUEConnector")
                 return False
