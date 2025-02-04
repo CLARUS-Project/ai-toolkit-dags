@@ -206,6 +206,7 @@ def redwine_production_dag_over_k8s_inference_ids():
         import subprocess
         import src.redwine.config
         import requests
+        import json
 
         """
         MODIFY WHAT YOU WANT
@@ -216,6 +217,7 @@ def redwine_production_dag_over_k8s_inference_ids():
         endpoint_service_internal_port = '8000'
         exp_id= src.redwine.config.MLFLOW_EXPERIMENT
         exp_description=''
+        asset_type='docker'
 
         def download_artifacts(run_id, path):
             mlflow.set_tracking_uri("http://mlflow-tracking.mlflow.svc.cluster.local:5000")
@@ -249,15 +251,32 @@ def redwine_production_dag_over_k8s_inference_ids():
                     f.write(f"{package}\n")
 
 
-        def create_ids_resource_if_not_exists(exp_id,exp_description,asset_type=docker,endpoint_ids,endpoint_service_internal_port):
+        def create_ids_resource_if_not_exists(exp_id,exp_description,asset_type,endpoint_ids,endpoint_service_internal_port):
             
-            #request calrus_ids_agent asset description
-            url = "http://34.250.205.215:8082/api/provider/asset?exp_id="+expId
+            #request clarus_ids_agent asset description
+            url = "http://34.250.205.215:8082/api/provider/asset?exp_id="+exp_id
             ret = requests.get(url, verify= False, timeout=120)
             #if not error
-            if ret is None or ret.status_code != 200:
-                #request clarus_ids_agent asset creation 
-
+            if ret.status_code != 200:
+                return False
+            #request clarus_ids_agent asset creation 
+            url = "http://34.250.205.215:8082/api/v3/provider/asset"
+            payload = {
+                "exp_id": exp_id,
+                "exp_description": exp_description,
+                "asset_type": asset_type,
+                "docker_img_url": endpoint_ids,
+                "docker_img_port": endpoint_service_internal_port
+            }
+            json_payload = json.dump(payload)
+            ret= requests.post(url, data=json_payload, headers={"Content-Type": "application/json"})
+            if ret.status_code == 400:
+                logging.warning(f"Service inference not registed in TRUEConnector")
+                return False
+            else:
+                logging.warning(f"Service inference registed in TRUEConnector")
+                return True
+           
 
         logging.warning(f"Downloading artifacts from run_id: {run_id['best_run']}")
         download_artifacts(run_id['best_run'], path)
@@ -276,7 +295,7 @@ def redwine_production_dag_over_k8s_inference_ids():
         )
         logging.warning(f"Kaniko executor finished with return code: {result.returncode}")
     
-
+        create_ids_resource_if_not_exists(exp_id,exp_description,asset_type,endpoint_ids,endpoint_service_internal_port)
 
 
     # Instantiate each task and define task dependencies
